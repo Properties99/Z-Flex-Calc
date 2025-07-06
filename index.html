@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Budget Calculator</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+        .dimmed {
+            opacity: 0.5;
+            font-size: 0.8em;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1><strong>Property Budget</strong></h1>
+
+    <div class="input-group">
+        <label for="unitPrice">Unit Price:</label>
+        <input type="number" id="unitPrice" oninput="calculateRemaining()" value="8800000">
+    </div>
+
+    <div class="input-group">
+        <label for="paid">Paid:</label>
+        <input type="number" id="paid" oninput="calculateRemaining()">
+    </div>
+
+    <div class="input-group">
+        <label for="unitOver">Unit Over:</label>
+        <select id="unitOver" onchange="calculateRemaining()">
+            <option value="1000000">1M</option>
+            <option value="1500000">1.5M</option>
+            <option value="2000000">2M</option>
+            <option value="2500000">2.5M</option>
+            <option value="3000000">3M</option>
+            <option value="3500000">3.5M</option>
+            <option value="4000000">4M</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="downPayment">Down Payment:</label>
+        <input type="number" id="downPayment" readonly>
+    </div>
+
+    <div class="input-group dimmed">
+        <label for="commission">Commission (%):</label>
+        <input type="number" id="commission" value="2.5" readonly>
+    </div>
+
+    <div class="input-group dimmed">
+        <label for="taxRate">Tax Rate (%):</label>
+        <select id="taxRate" onchange="calculateRemaining()">
+            <option value="4">4%</option>
+            <option value="3">3%</option>
+            <option value="2.5">2.5%</option>
+        </select>
+    </div>
+
+    <div class="input-group dimmed">
+        <label for="maintenance">Maintenance (%):</label>
+        <select id="maintenance" onchange="calculateRemaining()">
+            <option value="10">10%</option>
+            <option value="9">9%</option>
+            <option value="8">8%</option>
+        </select>
+    </div>
+    
+    <div class="input-group dimmed">
+        <label for="maintenanceValue">Maintenance Value:</label>
+        <input type="number" id="maintenanceValue" readonly>
+    </div>
+
+    <div class="input-group dimmed">
+        <label for="remaining">Remaining:</label>
+        <input type="number" id="remaining" readonly>
+    </div>
+
+    <div class="input-group dimmed">
+        <label for="remainingPercentage">Remaining (%):</label>
+        <input type="number" id="remainingPercentage" readonly>
+    </div>
+
+    <button onclick="calculateBudget()">Calculate Budget</button>
+
+    <script>
+        function calculateBudget() {
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value);
+            const commissionRate = parseFloat(document.getElementById('commission').value);
+            const taxRate = parseFloat(document.getElementById('taxRate').value);
+            const maintenanceRate = parseFloat(document.getElementById('maintenance').value);
+            const unitOver = parseFloat(document.getElementById('unitOver').value) || 0;
+
+            const maintenanceAmount = unitPrice * (maintenanceRate / 100);
+            const commissionAmount = (unitPrice + maintenanceAmount + unitOver) * (commissionRate / 100);
+            const totalBeforeTax = unitPrice + maintenanceAmount + commissionAmount + unitOver;
+            const finalPrice = totalBeforeTax * ((100 + taxRate) / 100);
+
+            alert("Final Price: EG " + finalPrice.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+        }
+
+        function calculateRemaining() {
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const paid = parseFloat(document.getElementById('paid').value) || 0;
+            const maintenanceRate = parseFloat(document.getElementById('maintenance').value) || 0;
+            const unitOver = parseFloat(document.getElementById('unitOver').value) || 0;
+            const commissionRate = parseFloat(document.getElementById('commission').value) || 0;
+            const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+
+            const maintenanceValue = unitPrice * (maintenanceRate / 100);
+            const commissionValue = (unitPrice + maintenanceValue + unitOver) * (commissionRate / 100);
+            const taxValue = paid * (taxRate / 100);
+
+            const remaining = unitPrice - paid + maintenanceValue;
+            const remainingPercentage = (remaining / unitPrice) * 100;
+            const downPayment = paid + commissionValue + taxValue + unitOver;
+
+            document.getElementById('maintenanceValue').value = maintenanceValue.toFixed(2);
+            document.getElementById('remaining').value = remaining.toFixed(2);
+            document.getElementById('remainingPercentage').value = remainingPercentage.toFixed(2);
+            document.getElementById('downPayment').value = downPayment.toFixed(2);
+        }
+    </script>
+</body>
+</html>
